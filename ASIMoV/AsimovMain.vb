@@ -34,9 +34,8 @@ Public Class AsimovMain
 
         ServerMSG = "E"
 
-        If ClientMSG = "" Then
-            ServerCommand = "E"
-            Exit Function
+        If String.IsNullOrEmpty(ClientMSG) Then
+            Return "E"
         End If
 
         Try
@@ -44,7 +43,6 @@ Public Class AsimovMain
             Exit Try
 
         Catch
-
             MsgBox("Unable to connect to the server.", MsgBoxStyle.Exclamation, "ViBE Error")
             ServerCommand = "NOCONNECT"
             Exit Function
@@ -249,9 +247,8 @@ Public Class AsimovMain
     ''' Renders a fancier input box
     ''' </summary>
     ''' <param name="Prompt">The prompt of the InputBox</param>
-    ''' <param name="Title">The title of the dialog</param>
     ''' <returns></returns>
-    Function FancyInputBox(ByVal Prompt As String, Optional ByVal Title As String = "", Optional ByVal maxstringlength As Integer = 999999) As String
+    Shared Function FancyInputBox(ByVal Prompt As String, Optional ByVal maxstringlength As Integer = 999999) As String
 
         InputForm.PromptLBL.Text = Prompt
         InputForm.Answer.Text = ""
@@ -328,7 +325,7 @@ Public Class AsimovMain
         Dim NewPin As String
 
         Try
-            NewPin = FancyInputBox("New Pin:",, 4)
+            NewPin = FancyInputBox("New Pin:", 4)
             If NewPin = "CANCEL" Then Exit Sub
             If Not NewPin.Length = 4 Then
                 MsgBox("Invalid input specified", MsgBoxStyle.Critical, "Error")
@@ -364,12 +361,13 @@ Public Class AsimovMain
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        Dim OpenFile As New OpenFileDialog
-        OpenFile.InitialDirectory = My.Application.Info.DirectoryPath
-        OpenFile.Multiselect = False
-        OpenFile.FileName = "AsIMOV Report (XX-XX-20XX XX-XX-XX PM).csv"
-        OpenFile.DefaultExt = ".csv"
-        OpenFile.Filter = "Asimov Reports (*.csv)|*.csv"
+        Dim OpenFile As New OpenFileDialog With {
+            .InitialDirectory = My.Application.Info.DirectoryPath,
+            .Multiselect = False,
+            .FileName = "AsIMOV Report (XX-XX-20XX XX-XX-XX PM).csv",
+            .DefaultExt = ".csv",
+            .Filter = "Asimov Reports (*.csv)|*.csv"
+        }
 
         Dim DoTheDo As Boolean = OpenFile.ShowDialog()
 
@@ -380,7 +378,7 @@ Public Class AsimovMain
         OpenFile.Dispose()
     End Sub
 
-    Public Sub ConvertReport(Filename As String)
+    Public Shared Sub ConvertReport(Filename As String)
 
         'Now lets make an excel
         Dim ExcelApp As Excel._Application
@@ -431,7 +429,7 @@ Public Class AsimovMain
         SelectedRange.Value = ReportDate
         SelectedRange.Font.Italic = True
 
-        '''TABLE SETUP
+        'TABLE SETUP
 
         'RegularHeaders
         CurrentWorksheet.Range("A5").Value = "ID"
@@ -453,7 +451,7 @@ Public Class AsimovMain
         For Each CurrentUser As String In UsersArrayList
             If CurrentUser.StartsWith("T") Then Exit For
             Dim Doot() = CurrentUser.Split(",")
-            Users = Users + 1
+            Users += 1
             CurrentWorksheet.Range("A" & (5 + Users)).Value = Doot(0)
             CurrentWorksheet.Range("B" & (5 + Users)).Value = Doot(1)
             If Doot(2) Then

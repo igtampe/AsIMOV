@@ -88,6 +88,7 @@
     <Compile Include="GenerateReport.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="GlobalSuppressions.vb" />
     <Compile Include="InputForm.Designer.vb">
       <DependentUpon>InputForm.vb</DependentUpon>
     </Compile>

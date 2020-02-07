@@ -1,6 +1,6 @@
 ﻿Public Class InputForm
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
-        If Answer.Text.Trim = "" Then
+        If String.IsNullOrEmpty(Answer.Text.Trim) Then
             MsgBox("Please specify an answer to the prompt", MsgBoxStyle.Critical, "Error")
         Else
             Me.DialogResult = DialogResult.OK

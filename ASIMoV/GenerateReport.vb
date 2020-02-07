@@ -83,10 +83,7 @@
         AllTotalIncome = 0
         AllTotalTax = 0
 
-        Dim NonGovernmentAccounts
-        NonGovernmentAccounts = 0
-
-        NonGovernmentAccounts = DirectoryArray.Count
+        Dim NonGovernmentAccounts = DirectoryArray.Count
 
         'For X = 0 To DirectoryArray.Count - 1
         'If DirectoryArray(X).EndsWith("(Gov.)") Then
@@ -159,21 +156,16 @@
 
             Dim TotalBalance As Long
             Dim Username As String
-            Dim UMSNB As Boolean
-            Dim GBANK As Boolean
-            Dim RIVER As Boolean
             Dim UMSNBBalance As Long
             Dim GBANKBalance As Long
             Dim RIVERBalance As Long
             Dim corporate As Boolean
             Dim Government As Boolean
 
-            If SplitValues(0) = 1 Then UMSNB = True Else UMSNB = False
             UMSNBBalance = SplitValues(1)
-            If SplitValues(2) = 1 Then GBANK = True Else GBANK = False
             GBANKBalance = SplitValues(3)
-            If SplitValues(4) = 1 Then RIVER = True Else RIVER = False
             RIVERBalance = SplitValues(5)
+
             Username = SplitValues(6)
             If Username.EndsWith("(Corp.)") Then
                 Username = Username.Replace(" (Corp.)", "")
@@ -194,7 +186,6 @@
 
             Dim Income As Long
             Dim EI As Long
-            Dim TaxBracket As String
             Dim Tax As Long
             Dim Total As Long
             Dim TaxPercentage As Single
@@ -214,40 +205,35 @@
                 If Total > 500000000 Then
                     Tax = Total * 0.02
                     TaxPercentage = 0.02
-                    TaxBracket = "Corporate Taxed (2%)"
                 Else
                     Tax = 0
                     TaxPercentage = 0
-                    TaxBracket = "Corporate Exempt (0%)"
                 End If
 
             ElseIf Government Then
                 Tax = 0
                 TaxPercentage = 0
-                TaxBracket = "Government"
             Else
                 If Total > 5000000 Then
                     Tax = Total * 0.05
                     TaxPercentage = 0.05
-                    TaxBracket = "Personal Taxed (5%)"
                 Else
                     Tax = 0
                     TaxPercentage = 0
-                    TaxBracket = "Personal Exempt (0%)"
                 End If
 
             End If
             'PrintLine(1, "ID,NAME,CORPORATE,UMSNB,GBANK,RIVER,TOTAL,INCOME,PERCENTAGE,TAX")
             PrintLine(1, LogonID & "," & Username & "," & corporate.ToString & "," & UMSNBBalance & "," & GBANKBalance & "," & RIVERBalance & "," & TotalBalance & "," & Income & "," & EI & "," & Total & "," & TaxPercentage & "," & Tax)
 
-            UMSNBTotalBalance = UMSNBTotalBalance + UMSNBBalance
-            GBANKTotalBalance = GBANKTotalBalance + GBANKBalance
-            RIVERTotalBalance = RIVERTotalBalance + RIVERBalance
-            AllTotalBalance = AllTotalBalance + TotalBalance
-            AllMonthlyIncome = AllMonthlyIncome + Income
-            AllExtraIncome = AllExtraIncome + EI
-            AllTotalIncome = AllTotalIncome + Total
-            AllTotalTax = AllTotalTax + Tax
+            UMSNBTotalBalance += UMSNBBalance
+            GBANKTotalBalance += GBANKBalance
+            RIVERTotalBalance += RIVERBalance
+            AllTotalBalance += TotalBalance
+            AllMonthlyIncome += Income
+            AllExtraIncome += EI
+            AllTotalIncome += Total
+            AllTotalTax += Tax
 GovernmentAccountSkip:
 
         Next
