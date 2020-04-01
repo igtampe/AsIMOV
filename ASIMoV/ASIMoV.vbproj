@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <StartupObject>ASIMoV.My.MyApplication</StartupObject>
     <RootNamespace>ASIMoV</RootNamespace>
-    <AssemblyName>ASIMoV</AssemblyName>
+    <AssemblyName>AsIMOV</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
@@ -22,7 +22,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>ASIMoV.xml</DocumentationFile>
+    <DocumentationFile>AsIMOV.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -32,7 +32,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>ASIMoV.xml</DocumentationFile>
+    <DocumentationFile>AsIMOV.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -49,6 +49,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Asimov2000Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -82,6 +85,58 @@
     <Compile Include="AsimovMain.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Commands\CoreCommands.vb" />
+    <Compile Include="Commands\EzTaxCommands.vb" />
+    <Compile Include="Commands\ServerCommand.vb" />
+    <Compile Include="EzTax\EzTaxAbout.Designer.vb">
+      <DependentUpon>EzTaxAbout.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EzTax\EzTaxAbout.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EzTax\EzTaxBreakdown.Designer.vb">
+      <DependentUpon>EzTaxBreakdown.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EzTax\EzTaxBreakdown.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EzTax\EzTaxCertify.Designer.vb">
+      <DependentUpon>EzTaxCertify.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EzTax\EzTaxCertify.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EzTax\EzTaxDetails.Designer.vb">
+      <DependentUpon>EzTaxDetails.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EzTax\EzTaxDetails.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EzTax\EZTaxMain.Designer.vb">
+      <DependentUpon>EZTaxMain.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EzTax\EZTaxMain.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EzTax\EZTaxSplash.Designer.vb">
+      <DependentUpon>EZTaxSplash.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EzTax\EZTaxSplash.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EzTax\EzTaxUpdateIncome.Designer.vb">
+      <DependentUpon>EzTaxUpdateIncome.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EzTax\EzTaxUpdateIncome.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EzTax\EZTaxWizard.Designer.vb">
+      <DependentUpon>EzTaxWizard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EzTax\EzTaxWizard.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EzTax\Utils\TaxCalc.vb" />
     <Compile Include="GenerateReport.Designer.vb">
       <DependentUpon>GenerateReport.vb</DependentUpon>
     </Compile>
@@ -116,6 +171,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="UMSWEBAccount.vb" />
     <Compile Include="UserLoad.Designer.vb">
       <DependentUpon>UserLoad.vb</DependentUpon>
     </Compile>
@@ -126,6 +182,30 @@
   <ItemGroup>
     <EmbeddedResource Include="AsimovMain.resx">
       <DependentUpon>AsimovMain.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EzTax\EzTaxAbout.resx">
+      <DependentUpon>EzTaxAbout.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EzTax\EzTaxBreakdown.resx">
+      <DependentUpon>EzTaxBreakdown.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EzTax\EzTaxCertify.resx">
+      <DependentUpon>EzTaxCertify.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EzTax\EzTaxDetails.resx">
+      <DependentUpon>EzTaxDetails.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EzTax\EZTaxMain.resx">
+      <DependentUpon>EZTaxMain.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EzTax\EZTaxSplash.resx">
+      <DependentUpon>EZTaxSplash.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EzTax\EzTaxUpdateIncome.resx">
+      <DependentUpon>EzTaxUpdateIncome.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EzTax\EZTaxWizard.resx">
+      <DependentUpon>EzTaxWizard.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GenerateReport.resx">
       <DependentUpon>GenerateReport.vb</DependentUpon>
@@ -147,6 +227,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -166,6 +247,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Asimov2000Icon.ico" />
+    <None Include="EzTax\Resources\EZTaxSplash.png" />
+    <None Include="EzTax\Resources\EzTaxLogo.png" />
+    <None Include="EzTax\Resources\EzTaxDenied.png" />
+    <None Include="EzTax\Resources\EzTaxButton.png" />
+    <None Include="EzTax\Resources\EzTaxApproved.png" />
+    <None Include="EzTax\Resources\EzTax.png" />
     <None Include="Resources\AsimovLogoBIG.png" />
   </ItemGroup>
   <ItemGroup>

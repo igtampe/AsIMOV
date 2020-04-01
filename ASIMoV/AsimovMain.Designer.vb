@@ -52,22 +52,15 @@ Partial Class AsimovMain
         Me.IncomeLabel = New System.Windows.Forms.Label()
         Me.Label11 = New System.Windows.Forms.Label()
         Me.Label12 = New System.Windows.Forms.Label()
-        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
         Me.CorporateCHKBX = New System.Windows.Forms.CheckBox()
-        Me.TaxDueLabel = New System.Windows.Forms.Label()
-        Me.TaxBracketLabel = New System.Windows.Forms.Label()
-        Me.Label17 = New System.Windows.Forms.Label()
-        Me.Label18 = New System.Windows.Forms.Label()
         Me.ActionsGroupBox = New System.Windows.Forms.GroupBox()
         Me.LoadDirectory = New System.ComponentModel.BackgroundWorker()
         Me.LoadUser = New System.ComponentModel.BackgroundWorker()
-        Me.GenericBackgroundWorker = New System.ComponentModel.BackgroundWorker()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
-        Me.GroupBox4.SuspendLayout()
         Me.ActionsGroupBox.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -202,6 +195,7 @@ Partial Class AsimovMain
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.CorporateCHKBX)
         Me.GroupBox1.Controls.Add(Me.Label19)
         Me.GroupBox1.Controls.Add(Me.Label13)
         Me.GroupBox1.Controls.Add(Me.Label5)
@@ -348,64 +342,16 @@ Partial Class AsimovMain
         Me.Label12.TabIndex = 8
         Me.Label12.Text = "Monthly Income"
         '
-        'GroupBox4
-        '
-        Me.GroupBox4.Controls.Add(Me.CorporateCHKBX)
-        Me.GroupBox4.Controls.Add(Me.TaxDueLabel)
-        Me.GroupBox4.Controls.Add(Me.TaxBracketLabel)
-        Me.GroupBox4.Controls.Add(Me.Label17)
-        Me.GroupBox4.Controls.Add(Me.Label18)
-        Me.GroupBox4.Location = New System.Drawing.Point(237, 190)
-        Me.GroupBox4.Name = "GroupBox4"
-        Me.GroupBox4.Size = New System.Drawing.Size(200, 89)
-        Me.GroupBox4.TabIndex = 13
-        Me.GroupBox4.TabStop = False
-        Me.GroupBox4.Text = "Tax"
-        '
         'CorporateCHKBX
         '
         Me.CorporateCHKBX.AutoSize = True
         Me.CorporateCHKBX.Enabled = False
-        Me.CorporateCHKBX.Location = New System.Drawing.Point(9, 57)
+        Me.CorporateCHKBX.Location = New System.Drawing.Point(309, 18)
         Me.CorporateCHKBX.Name = "CorporateCHKBX"
         Me.CorporateCHKBX.Size = New System.Drawing.Size(72, 17)
         Me.CorporateCHKBX.TabIndex = 15
         Me.CorporateCHKBX.Text = "Corporate"
         Me.CorporateCHKBX.UseVisualStyleBackColor = True
-        '
-        'TaxDueLabel
-        '
-        Me.TaxDueLabel.AutoSize = True
-        Me.TaxDueLabel.Location = New System.Drawing.Point(123, 29)
-        Me.TaxDueLabel.Name = "TaxDueLabel"
-        Me.TaxDueLabel.Size = New System.Drawing.Size(0, 13)
-        Me.TaxDueLabel.TabIndex = 12
-        '
-        'TaxBracketLabel
-        '
-        Me.TaxBracketLabel.AutoSize = True
-        Me.TaxBracketLabel.Location = New System.Drawing.Point(123, 16)
-        Me.TaxBracketLabel.Name = "TaxBracketLabel"
-        Me.TaxBracketLabel.Size = New System.Drawing.Size(0, 13)
-        Me.TaxBracketLabel.TabIndex = 11
-        '
-        'Label17
-        '
-        Me.Label17.AutoSize = True
-        Me.Label17.Location = New System.Drawing.Point(6, 29)
-        Me.Label17.Name = "Label17"
-        Me.Label17.Size = New System.Drawing.Size(52, 13)
-        Me.Label17.TabIndex = 9
-        Me.Label17.Text = "Total Tax"
-        '
-        'Label18
-        '
-        Me.Label18.AutoSize = True
-        Me.Label18.Location = New System.Drawing.Point(6, 16)
-        Me.Label18.Name = "Label18"
-        Me.Label18.Size = New System.Drawing.Size(65, 13)
-        Me.Label18.TabIndex = 8
-        Me.Label18.Text = "Tax Bracket"
         '
         'ActionsGroupBox
         '
@@ -413,7 +359,7 @@ Partial Class AsimovMain
         Me.ActionsGroupBox.Controls.Add(Me.AddFundsBTN)
         Me.ActionsGroupBox.Controls.Add(Me.ModIncomeBTN)
         Me.ActionsGroupBox.Controls.Add(Me.RefreshBTN)
-        Me.ActionsGroupBox.Location = New System.Drawing.Point(443, 190)
+        Me.ActionsGroupBox.Location = New System.Drawing.Point(237, 187)
         Me.ActionsGroupBox.Name = "ActionsGroupBox"
         Me.ActionsGroupBox.Size = New System.Drawing.Size(200, 89)
         Me.ActionsGroupBox.TabIndex = 13
@@ -427,12 +373,9 @@ Partial Class AsimovMain
         '
         Me.LoadUser.WorkerReportsProgress = True
         '
-        'GenericBackgroundWorker
-        '
-        '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(443, 290)
+        Me.Button1.Location = New System.Drawing.Point(443, 240)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(200, 23)
         Me.Button1.TabIndex = 14
@@ -441,7 +384,7 @@ Partial Class AsimovMain
         '
         'Button2
         '
-        Me.Button2.Location = New System.Drawing.Point(237, 290)
+        Me.Button2.Location = New System.Drawing.Point(443, 211)
         Me.Button2.Name = "Button2"
         Me.Button2.Size = New System.Drawing.Size(200, 23)
         Me.Button2.TabIndex = 15
@@ -452,12 +395,11 @@ Partial Class AsimovMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(655, 325)
+        Me.ClientSize = New System.Drawing.Size(655, 287)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.ActionsGroupBox)
-        Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.NameLabel)
@@ -473,8 +415,6 @@ Partial Class AsimovMain
         Me.GroupBox1.PerformLayout()
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox3.PerformLayout()
-        Me.GroupBox4.ResumeLayout(False)
-        Me.GroupBox4.PerformLayout()
         Me.ActionsGroupBox.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
@@ -507,18 +447,12 @@ Partial Class AsimovMain
     Friend WithEvents IncomeLabel As Label
     Friend WithEvents Label11 As Label
     Friend WithEvents Label12 As Label
-    Friend WithEvents GroupBox4 As GroupBox
-    Friend WithEvents TaxDueLabel As Label
-    Friend WithEvents TaxBracketLabel As Label
-    Friend WithEvents Label17 As Label
-    Friend WithEvents Label18 As Label
     Friend WithEvents ActionsGroupBox As GroupBox
     Friend WithEvents Label19 As Label
     Friend WithEvents Label13 As Label
     Friend WithEvents Label5 As Label
     Friend WithEvents LoadDirectory As System.ComponentModel.BackgroundWorker
     Friend WithEvents LoadUser As System.ComponentModel.BackgroundWorker
-    Friend WithEvents GenericBackgroundWorker As System.ComponentModel.BackgroundWorker
     Friend WithEvents Button1 As Button
     Friend WithEvents CorporateCHKBX As CheckBox
     Friend WithEvents Button2 As Button

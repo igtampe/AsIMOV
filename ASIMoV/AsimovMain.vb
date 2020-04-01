@@ -1,7 +1,5 @@
 ﻿Imports System.ComponentModel
-Imports System.IO
 Imports Microsoft.Office.Interop
-Imports System.Net.Sockets
 
 Public Class AsimovMain
 
@@ -11,9 +9,6 @@ Public Class AsimovMain
     Public splitvalues() As String
     Public Incomes() As String
     Public WorkerStatus As Integer
-
-
-
 
     Private Sub HeyItsTimeToLoad() Handles Me.Shown
 
@@ -25,55 +20,7 @@ Public Class AsimovMain
     End Sub
 
     Public Function ServerCommand(ByVal ClientMSG As String) As String
-
-        Dim tc As TcpClient = New TcpClient()
-        Dim ns As NetworkStream
-        Dim br As BinaryReader
-        Dim bw As BinaryWriter
-
-
-        ServerMSG = "E"
-
-        If String.IsNullOrEmpty(ClientMSG) Then
-            Return "E"
-        End If
-
-        Try
-            tc.Connect(“IGTNET-W.DDNS.NET”, 757)
-            Exit Try
-
-        Catch
-            MsgBox("Unable to connect to the server.", MsgBoxStyle.Exclamation, "ViBE Error")
-            ServerCommand = "NOCONNECT"
-            Exit Function
-
-        End Try
-
-
-
-        If tc.Connected = True Then
-            ns = tc.GetStream
-            br = New BinaryReader(ns)
-            bw = New BinaryWriter(ns)
-
-            bw.Write(ClientMSG)
-
-            Try
-                ServerMSG = br.ReadString()
-            Catch
-                MsgBox("Seems like the server might've crashed! Contact CHOPO!", MsgBoxStyle.Exclamation, "ViBE Error")
-                ServerCommand = "CRASH"
-                Exit Function
-
-            End Try
-
-
-            tc.Close()
-
-        End If
-
-        ServerCommand = ServerMSG
-
+        Return ASIMoV.ServerCommand.RawCommand(ClientMSG)
     End Function
 
     Private Sub DoTheCosos() Handles LoadDirectory.DoWork
@@ -90,7 +37,6 @@ Public Class AsimovMain
 
         ListBox1.Visible = True
         SplashScreen.Close()
-
     End Sub
 
     Private Sub OhItChanged() Handles ListBox1.SelectedIndexChanged
@@ -136,18 +82,13 @@ Public Class AsimovMain
         Select Case WorkerStatus
             Case 0
                 UserLoad.StatusLabel.Text = "Retrieving Bank Balances"
-
             Case 1
                 UserLoad.StatusLabel.Text = "Retrieving Tax Information"
-
             Case 2
                 UserLoad.StatusLabel.Text = "Displaying Information"
-
             Case Else
                 UserLoad.StatusLabel.Text = "The Background Worker is doing ALGO"
-
         End Select
-
     End Sub
 
     Private Sub LoadUser_RunWorkerCompleted() Handles LoadUser.RunWorkerCompleted
@@ -194,8 +135,6 @@ Public Class AsimovMain
 
         Dim Income As Long
         Dim EI As Long
-        Dim TaxBracket As String
-        Dim Tax As Long
         Dim Total As Long
 
 
@@ -204,34 +143,9 @@ Public Class AsimovMain
 
         Total = Income + EI
 
-        If corporate Then
-
-            If Total > 500000000 Then
-                Tax = Total * 0.02
-                TaxBracket = "Corporate Taxed (2%)"
-            Else
-                Tax = 0
-                TaxBracket = "Corporate Exempt (0%)"
-            End If
-
-        Else
-            If Total > 5000000 Then
-                Tax = Total * 0.05
-                TaxBracket = "Personal Taxed (5%)"
-            Else
-                Tax = 0
-                TaxBracket = "Personal Exempt (0%)"
-            End If
-
-        End If
-
-
-
         IncomeLabel.Text = Income.ToString("N0") & "p"
         EILabel.Text = EI.ToString("N0") & "p"
         TotalLabel.Text = Total.ToString("N0") & "p"
-        TaxBracketLabel.Text = TaxBracket
-        TaxDueLabel.Text = Tax.ToString("N0") & "p"
 
 
         UserLoad.Close()
@@ -297,26 +211,13 @@ Public Class AsimovMain
     End Sub
 
     Private Sub ModIncomeBTN_Click(sender As Object, e As EventArgs) Handles ModIncomeBTN.Click
-        Dim AmountSTR As String
-        Dim Amount As Long
-
-        Try
-            AmountSTR = FancyInputBox("New Income:")
-            If AmountSTR = "CANCEL" Then Exit Sub
-            Amount = CInt(AmountSTR)
-        Catch
-            MsgBox("Invalid input specified", MsgBoxStyle.Critical, "Error")
-            Exit Sub
-        End Try
-
-        Select Case ServerCommand("EZTUPD" & LogonID & Amount)
-            Case "E"
-                MsgBox("Could not update income", vbCritical, "ASIMoV")
-
-            Case "S"
-                MsgBox("Updated income succesfully", vbInformation, "ASIMoV")
-        End Select
-
+        Dim cat As Integer = 0
+        If CorporateCHKBX.Checked Then cat = 1
+        Dim NewEztaxWindow As EZTaxMain = New EZTaxMain With {
+            .ID = LogonID,
+            .Category = cat
+        }
+        NewEztaxWindow.Show()
 
 
     End Sub
@@ -348,16 +249,8 @@ Public Class AsimovMain
 
     End Sub
 
-    Private Sub GenericBackgroundWorker_DoWork(sender As Object, e As DoWorkEventArgs) Handles GenericBackgroundWorker.DoWork
-
-    End Sub
-
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
         GenerateReport.ShowDialog()
-    End Sub
-
-    Private Sub DoTheCosos(sender As Object, e As DoWorkEventArgs) Handles LoadDirectory.DoWork
-
     End Sub
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
@@ -407,7 +300,7 @@ Public Class AsimovMain
         Dim ReportDate As String = LineInput(1)
         LineInput(1)
         LineInput(1)
-        LineInput(1)
+        Dim Headers() As String = LineInput(1).Split(",")
 
         Dim UsersArrayList As New ArrayList
 
@@ -432,76 +325,73 @@ Public Class AsimovMain
         'TABLE SETUP
 
         'RegularHeaders
-        CurrentWorksheet.Range("A5").Value = "ID"
-        CurrentWorksheet.Range("B5").Value = "NAME"
-        CurrentWorksheet.Range("C5").Value = "CORP."
-        CurrentWorksheet.Range("D5").Value = "UMSNB"
-        CurrentWorksheet.Range("E5").Value = "GBANK"
-        CurrentWorksheet.Range("F5").Value = "RIVER"
-        CurrentWorksheet.Range("G5").Value = "TOTAL"
-        CurrentWorksheet.Range("H5").Value = "MONTHLY"
-        CurrentWorksheet.Range("I5").Value = "EXTRA"
-        CurrentWorksheet.Range("J5").Value = "TOTAL"
-        CurrentWorksheet.Range("K5").Value = "%"
-        CurrentWorksheet.Range("L5").Value = "AMOUNT"
+        SelectedRange = CurrentWorksheet.Range("A5")
+        Dim X As Integer = 0
+        For Each Header As String In Headers
+            SelectedRange.Offset(0, X).Value = Header
+            X += 1
+        Next
 
         'AddData
         Dim Users As Integer = 0
+        Dim D As Integer = 0
 
-        For Each CurrentUser As String In UsersArrayList
-            If CurrentUser.StartsWith("T") Then Exit For
-            Dim Doot() = CurrentUser.Split(",")
+        For Each User As String In UsersArrayList
+            If User.StartsWith(",T") Then Exit For
+            Dim Doot() = User.Split(",")
+
             Users += 1
-            CurrentWorksheet.Range("A" & (5 + Users)).Value = Doot(0)
-            CurrentWorksheet.Range("B" & (5 + Users)).Value = Doot(1)
-            If Doot(2) Then
-                CurrentWorksheet.Range("C" & (5 + Users)).Value = "✔"
-            Else
-                CurrentWorksheet.Range("C" & (5 + Users)).Value = ""
-            End If
+            D = 0
 
-            CurrentWorksheet.Range("D" & (5 + Users)).Value = Doot(3)
-            CurrentWorksheet.Range("E" & (5 + Users)).Value = Doot(4)
-            CurrentWorksheet.Range("F" & (5 + Users)).Value = Doot(5)
-            CurrentWorksheet.Range("G" & (5 + Users)).Value = Doot(6)
-            CurrentWorksheet.Range("H" & (5 + Users)).Value = Doot(7)
-            CurrentWorksheet.Range("I" & (5 + Users)).Value = Doot(8)
-            CurrentWorksheet.Range("J" & (5 + Users)).Value = Doot(9)
-            CurrentWorksheet.Range("K" & (5 + Users)).Value = Doot(10)
-            CurrentWorksheet.Range("L" & (5 + Users)).Value = Doot(11)
-
+            For Each BitOfInfo As String In Doot
+                SelectedRange.Offset(Users, D).Value = Doot(D)
+                D += 1
+            Next
         Next
 
         'TOTALS
         CurrentWorksheet.Range("A" & (5 + Users + 1)).Value = "TOTAL:"
-        CurrentWorksheet.Range("D" & (5 + Users + 1)).Value = "=SUM(D6:D" & (5 + Users) & ")"
         CurrentWorksheet.Range("E" & (5 + Users + 1)).Value = "=SUM(E6:E" & (5 + Users) & ")"
         CurrentWorksheet.Range("F" & (5 + Users + 1)).Value = "=SUM(F6:F" & (5 + Users) & ")"
         CurrentWorksheet.Range("G" & (5 + Users + 1)).Value = "=SUM(G6:G" & (5 + Users) & ")"
         CurrentWorksheet.Range("H" & (5 + Users + 1)).Value = "=SUM(H6:H" & (5 + Users) & ")"
-        CurrentWorksheet.Range("I" & (5 + Users + 1)).Value = "=SUM(I6:I" & (5 + Users) & ")"
+
         CurrentWorksheet.Range("J" & (5 + Users + 1)).Value = "=SUM(J6:J" & (5 + Users) & ")"
+        CurrentWorksheet.Range("K" & (5 + Users + 1)).Value = "=SUM(K6:K" & (5 + Users) & ")"
         CurrentWorksheet.Range("L" & (5 + Users + 1)).Value = "=SUM(L6:L" & (5 + Users) & ")"
+        CurrentWorksheet.Range("M" & (5 + Users + 1)).Value = "=SUM(M6:M" & (5 + Users) & ")"
+        CurrentWorksheet.Range("N" & (5 + Users + 1)).Value = "=SUM(N6:N" & (5 + Users) & ")"
+        CurrentWorksheet.Range("O" & (5 + Users + 1)).Value = "=SUM(O6:O" & (5 + Users) & ")"
+        CurrentWorksheet.Range("P" & (5 + Users + 1)).Value = "=SUM(P6:P" & (5 + Users) & ")"
+        CurrentWorksheet.Range("Q" & (5 + Users + 1)).Value = "=SUM(Q6:Q" & (5 + Users) & ")"
+
+        CurrentWorksheet.Range("AA" & (5 + Users + 1)).Value = "=SUM(AA6:AA" & (5 + Users) & ")"
+        CurrentWorksheet.Range("AB" & (5 + Users + 1)).Value = "=SUM(AB6:AB" & (5 + Users) & ")"
+        CurrentWorksheet.Range("AC" & (5 + Users + 1)).Value = "=SUM(AC6:AC" & (5 + Users) & ")"
+        CurrentWorksheet.Range("AD" & (5 + Users + 1)).Value = "=SUM(AD6:AD" & (5 + Users) & ")"
+        CurrentWorksheet.Range("AE" & (5 + Users + 1)).Value = "=SUM(AE6:AE" & (5 + Users) & ")"
+        CurrentWorksheet.Range("AF" & (5 + Users + 1)).Value = "=SUM(AF6:AF" & (5 + Users) & ")"
+        CurrentWorksheet.Range("AG" & (5 + Users + 1)).Value = "=SUM(AG6:AG" & (5 + Users) & ")"
+
 
         'NUMBER FORMATS
-        CurrentWorksheet.Range("D6", "J" & (5 + Users + 1)).NumberFormat = "$#,##0.00"
-        CurrentWorksheet.Range("L6", "L" & (5 + Users + 1)).NumberFormat = "$#,##0.00"
-        CurrentWorksheet.Range("K6", "K" & (5 + Users + 1)).NumberFormat = "0.00%"
+        CurrentWorksheet.Range("E6", "Q" & (5 + Users + 1)).NumberFormat = "$#,##0.00"
+        CurrentWorksheet.Range("AA6", "AG" & (5 + Users + 1)).NumberFormat = "$#,##0.00"
 
         'AUTOFIT
-        CurrentWorksheet.Columns("A:L").AutoFit()
+        CurrentWorksheet.Columns("A:AG").AutoFit()
 
         'TABLE
-        Dim IdentifierTable = CurrentWorksheet.ListObjects.AddEx(Excel.XlListObjectSourceType.xlSrcRange, CurrentWorksheet.Range("A5", "L" & (5 + Users)),, Excel.XlYesNoGuess.xlYes)
+        Dim IdentifierTable = CurrentWorksheet.ListObjects.AddEx(Excel.XlListObjectSourceType.xlSrcRange, CurrentWorksheet.Range("A5", "AG" & (5 + Users)),, Excel.XlYesNoGuess.xlYes)
         IdentifierTable.Name = "IdentifierTable"
         IdentifierTable.TableStyle = "TableStyleDark7"
 
-        CurrentWorksheet.Range("A" & (6 + Users), "L" & (6 + Users)).Interior.Color = Color.Black
-        CurrentWorksheet.Range("A" & (6 + Users), "L" & (6 + Users)).Font.Color = Color.White
+        CurrentWorksheet.Range("A" & (6 + Users), "AG" & (6 + Users)).Interior.Color = Color.Black
+        CurrentWorksheet.Range("A" & (6 + Users), "AG" & (6 + Users)).Font.Color = Color.White
 
 
         'SuperHeaders
-        SelectedRange = CurrentWorksheet.Range("A4", "C4")
+        SelectedRange = CurrentWorksheet.Range("A4", "D4")
         SelectedRange.Merge()
         SelectedRange.Value = "IDENTIFIERS"
         SelectedRange.Font.Color = Color.White
@@ -509,7 +399,7 @@ Public Class AsimovMain
         SelectedRange.Font.Bold = True
         SelectedRange.Font.Italic = True
 
-        SelectedRange = CurrentWorksheet.Range("D4", "G4")
+        SelectedRange = CurrentWorksheet.Range("E4", "H4")
         SelectedRange.Merge()
         SelectedRange.Value = "BANK BALANCES"
         SelectedRange.Font.Color = Color.White
@@ -517,7 +407,7 @@ Public Class AsimovMain
         SelectedRange.Font.Bold = True
         SelectedRange.Font.Italic = True
 
-        SelectedRange = CurrentWorksheet.Range("H4", "J4")
+        SelectedRange = CurrentWorksheet.Range("J4", "Q4")
         SelectedRange.Merge()
         SelectedRange.Value = "INCOME"
         SelectedRange.Font.Color = Color.White
@@ -525,7 +415,15 @@ Public Class AsimovMain
         SelectedRange.Font.Bold = True
         SelectedRange.Font.Italic = True
 
-        SelectedRange = CurrentWorksheet.Range("K4", "L4")
+        SelectedRange = CurrentWorksheet.Range("S4", "Y4")
+        SelectedRange.Merge()
+        SelectedRange.Value = "TAX BRACKETS"
+        SelectedRange.Font.Color = Color.White
+        SelectedRange.Interior.Color = Color.Black
+        SelectedRange.Font.Bold = True
+        SelectedRange.Font.Italic = True
+
+        SelectedRange = CurrentWorksheet.Range("AA4", "AG4")
         SelectedRange.Merge()
         SelectedRange.Value = "TAX"
         SelectedRange.Font.Color = Color.White
@@ -533,19 +431,19 @@ Public Class AsimovMain
         SelectedRange.Font.Bold = True
         SelectedRange.Font.Italic = True
 
-        CurrentWorksheet.Range("D5", "D" & (5 + Users)).Borders(Excel.XlBordersIndex.xlEdgeLeft).LineStyle = Excel.XlLineStyle.xlContinuous
-        CurrentWorksheet.Range("D5", "D" & (5 + Users)).Borders(Excel.XlBordersIndex.xlEdgeLeft).Color = Color.Black
-
-        CurrentWorksheet.Range("H5", "H" & (5 + Users)).Borders(Excel.XlBordersIndex.xlEdgeLeft).LineStyle = Excel.XlLineStyle.xlContinuous
-        CurrentWorksheet.Range("H5", "H" & (5 + Users)).Borders(Excel.XlBordersIndex.xlEdgeLeft).Color = Color.Black
-
-        CurrentWorksheet.Range("K5", "K" & (5 + Users)).Borders(Excel.XlBordersIndex.xlEdgeLeft).LineStyle = Excel.XlLineStyle.xlContinuous
-        CurrentWorksheet.Range("K5", "K" & (5 + Users)).Borders(Excel.XlBordersIndex.xlEdgeLeft).Color = Color.Black
+        SelectedRange = CurrentWorksheet.Range("I4", "I" & (Users + 6))
+        SelectedRange.Interior.Color = Color.Black
+        SelectedRange.ColumnWidth = 3
+        SelectedRange = CurrentWorksheet.Range("R4", "R" & (Users + 6))
+        SelectedRange.ColumnWidth = 3
+        SelectedRange.Interior.Color = Color.Black
+        SelectedRange = CurrentWorksheet.Range("Z4", "Z" & (Users + 6))
+        SelectedRange.ColumnWidth = 3
+        SelectedRange.Interior.Color = Color.Black
 
         ExcelApp.UserControl = True
 
     End Sub
-
 
 
 End Class

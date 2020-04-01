@@ -1,4 +1,5 @@
-﻿Public Class GenerateReport
+﻿Imports ASIMoV.EzTaxCommands
+Public Class GenerateReport
     Public Filename As String
     Public CurrentWorkerStatus As String
     Public CurrentWorkerStage As Integer
@@ -39,7 +40,7 @@
         PrintLine(1, DateTime.Now.ToLongDateString & " " & DateTime.Now.ToLongTimeString & ":")
         PrintLine(1, "")
         PrintLine(1, "")
-        PrintLine(1, "ID,NAME,CORPORATE,UMSNB,GBANK,RIVER,TOTAL,MI,EI,TI,PERCENTAGE,TAX")
+        PrintLine(1, "INDEX,ID,Name,CAT,UMSNB,GBANK,RIVER,Balance,,Newpond,Urbia,Paradisus,Laertes,North Osten,South Osten,Extra Income,Total Income,,Newpond Bracket,Urbia Bracket,Paradisus Bracket,Laertes Bracket,North Osten Bracket,South Osten Bracket,Federal Bracket,,Newpond Tax,Urbia Tax,Paradisus Tax,Laertes Tax,North Osten Tax, South Osten Tax, Federal Tax")
 
         If DoTheCoso.CancellationPending Then
             WorkerCanceled = True
@@ -62,188 +63,159 @@
             Exit Sub
         End If
 
-        Dim LogonID As String
-        Dim SplitValues As String()
-        Dim Incomes() As String
-        Dim UMSNBTotalBalance As Long
-        Dim GBANKTotalBalance As Long
-        Dim RIVERTotalBalance As Long
-        Dim AllTotalBalance As Long
-        Dim AllMonthlyIncome As Long
-        Dim AllExtraIncome As Long
-        Dim AllTotalIncome As Long
-        Dim AllTotalTax As Long
+        Dim UMSNBTotalBalance As Long = 0
+        Dim GBANKTotalBalance As Long = 0
+        Dim RIVERTotalBalance As Long = 0
+        Dim AllTotalBalance As Long = 0
 
-        UMSNBTotalBalance = 0
-        GBANKTotalBalance = 0
-        RIVERTotalBalance = 0
-        AllTotalBalance = 0
-        AllMonthlyIncome = 0
-        AllExtraIncome = 0
-        AllTotalIncome = 0
-        AllTotalTax = 0
+        Dim TotalFedIncome As Long = 0
+        Dim TotalNewpondIncome As Long = 0
+        Dim TotalUrbiaIncome As Long = 0
+        Dim TotalParadisusIncome As Long = 0
+        Dim TotalLaertesIncome As Long = 0
+        Dim TotalNOSTENIncome As Long = 0
+        Dim TotalSOSTENIncome As Long = 0
+
+        Dim TotalExtraIncome As Long = 0
+        Dim TotalIncome As Long = 0
+
+        Dim TotalFedTax As Long = 0
+        Dim TotalNewpondTax As Long = 0
+        Dim TotalUrbiaTax As Long = 0
+        Dim TotalParadisusTax As Long = 0
+        Dim TotalLaertesTax As Long = 0
+        Dim TotalNOSTENTax As Long = 0
+        Dim TotalSOSTENTax As Long = 0
 
         Dim NonGovernmentAccounts = DirectoryArray.Count
-
-        'For X = 0 To DirectoryArray.Count - 1
-        'If DirectoryArray(X).EndsWith("(Gov.)") Then
-        'do nothing
-        'Else
-        'NonGovernmentAccounts = NonGovernmentAccounts + 1
-        'End If
-        'Next
 
         Dim MeasuringTimeCoso As Stopwatch
         Dim TimeLeft As String
         TimeLeft = ""
         MeasuringTimeCoso = New Stopwatch
 
-        For X = 0 To DirectoryArray.Count - 1
-            'If DirectoryArray(X).EndsWith("(Gov.)") Then
-            'GoTo GovernmentAccountSkip
-            'End If
-            LogonID = DirectoryArray(X).Remove(5, DirectoryArray(X).Length - 5)
+        Dim X = 0
 
-
-            CurrentWorkerPercentage = CInt(((X + 0.3) / (NonGovernmentAccounts)) * 100)
-
+        For Each UserString As String In DirectoryArray
+            ''Update or percentage
+            CurrentWorkerStatus = "Retrieving All Information from " & UserString & ". " & TimeLeft
+            CurrentWorkerPercentage = CInt(((X) / (NonGovernmentAccounts)) * 100)
             CurrentWorkerStage = 1
-            CurrentWorkerStatus = "Retrieving balances for " & DirectoryArray(X) & ". " & TimeLeft
             DoTheCoso.ReportProgress(X)
 
+            ''Get all the information of the user
             MeasuringTimeCoso.Start()
-            ServerMSG = AsimovMain.ServerCommand("INFO" & LogonID)
+            Dim User As UMSWEBAccount = New UMSWEBAccount(UserString.Split(":")(0))
             MeasuringTimeCoso.Stop()
+
+            ''Update our time left
             TimeLeft = "Approximately " & (CInt(MeasuringTimeCoso.ElapsedMilliseconds / 1000) * (((NonGovernmentAccounts - X - 1) * 2) + 1)) & "s to go."
             Debug.Print("Ellapsed Seconds: " & MeasuringTimeCoso.ElapsedMilliseconds)
             MeasuringTimeCoso.Reset()
 
-            SplitValues = ServerMSG.Split(",")
+            ''Update our percentage
+            CurrentWorkerPercentage = CInt(((X + 0.7) / (NonGovernmentAccounts)) * 100)
+            CurrentWorkerStatus = "Adding to report"
+            DoTheCoso.ReportProgress(X)
+
+            ''We're one user ahead
+            X += 1
+
+            ''Make sure we don't want to cancel just yet
             If DoTheCoso.CancellationPending Then
                 WorkerCanceled = True
                 FileClose(1)
                 Exit Sub
             End If
 
-            CurrentWorkerPercentage = CInt(((X + 0.6) / (NonGovernmentAccounts)) * 100)
-            CurrentWorkerStage = 1
-            CurrentWorkerStatus = "Retrieving Tax Information for " & DirectoryArray(X) & ". " & TimeLeft
-            DoTheCoso.ReportProgress(X)
-
-            MeasuringTimeCoso.Start()
-            ServerMSG = AsimovMain.ServerCommand("EZTINF" & LogonID)
-            MeasuringTimeCoso.Stop()
-            TimeLeft = "Approximately " & (CInt(MeasuringTimeCoso.ElapsedMilliseconds / 1000) * (((NonGovernmentAccounts - X - 1) * 2))) & "s to go."
-            Debug.Print("Ellapsed Seconds: " & MeasuringTimeCoso.ElapsedMilliseconds)
-            MeasuringTimeCoso.Reset()
-
-            Incomes = ServerMSG.Split(",")
-
-            If DoTheCoso.CancellationPending Then
-                WorkerCanceled = True
-                FileClose(1)
-                Exit Sub
-            End If
-            If ServerMSG = "E" Then
-                WorkerCanceled = True
-                Exit Sub
-            End If
-
-            CurrentWorkerPercentage = CInt(((X + 0.9) / (NonGovernmentAccounts)) * 100)
-            CurrentWorkerStage = 1
-            CurrentWorkerStatus = "Adding the info to the report"
-            DoTheCoso.ReportProgress(X)
-
-            Dim TotalBalance As Long
-            Dim Username As String
-            Dim UMSNBBalance As Long
-            Dim GBANKBalance As Long
-            Dim RIVERBalance As Long
-            Dim corporate As Boolean
-            Dim Government As Boolean
-
-            UMSNBBalance = SplitValues(1)
-            GBANKBalance = SplitValues(3)
-            RIVERBalance = SplitValues(5)
-
-            Username = SplitValues(6)
-            If Username.EndsWith("(Corp.)") Then
-                Username = Username.Replace(" (Corp.)", "")
-                corporate = True
-            Else
-                corporate = False
-            End If
-
-            If Username.EndsWith("(Gov.)") Then
-                Username = Username.Replace(" (Gov.)", "")
-                Government = True
-            Else
-                Government = False
-            End If
+            PrintLine(1,
+                      X & "," &
+                      User.ID & "," &
+                      User.Name & "," &
+                      User.Category & "," &
+                      User.BankInfo.UMSNBBalance & "," &
+                      User.BankInfo.GBANKBalance & "," &
+                      User.BankInfo.RIVERBalance & "," &
+                      User.BankInfo.TotalBalance & "," &
+                      "" & "," &
+                      User.Taxinfo.NewpondIncome & "," &
+                      User.Taxinfo.UrbiaIncome & "," &
+                      User.Taxinfo.ParadisusIncome & "," &
+                      User.Taxinfo.LaertesIncome & "," &
+                      User.Taxinfo.NorthOstenIncome & "," &
+                      User.Taxinfo.SouthOstenIncome & "," &
+                      User.Taxinfo.ExtraIncome & "," &
+                      User.Taxinfo.FederalIncome & "," &
+                      "" & "," &
+                      User.Taxinfo.Newpond.Bracket.toString & "," &
+                      User.Taxinfo.Urbia.Bracket.toString & "," &
+                      User.Taxinfo.Paradisus.Bracket.toString & "," &
+                      User.Taxinfo.Laertes.Bracket.toString & "," &
+                      User.Taxinfo.NorthOsten.Bracket.toString & "," &
+                      User.Taxinfo.SouthOsten.Bracket.toString & "," &
+                      User.Taxinfo.Federal.Bracket.toString & "," &
+                      "" & "," &
+                      User.Taxinfo.Newpond.MoneyOwed & "," &
+                      User.Taxinfo.Urbia.MoneyOwed & "," &
+                      User.Taxinfo.Paradisus.MoneyOwed & "," &
+                      User.Taxinfo.Laertes.MoneyOwed & "," &
+                      User.Taxinfo.NorthOsten.MoneyOwed & "," &
+                      User.Taxinfo.SouthOsten.MoneyOwed & "," &
+                      User.Taxinfo.Federal.MoneyOwed)
 
 
-            TotalBalance = UMSNBBalance + GBANKBalance + RIVERBalance
+            UMSNBTotalBalance += User.BankInfo.UMSNBBalance
+            GBANKTotalBalance += User.BankInfo.GBANKBalance
+            RIVERTotalBalance += User.BankInfo.RIVERBalance
+            AllTotalBalance += User.BankInfo.TotalBalance
 
-            Dim Income As Long
-            Dim EI As Long
-            Dim Tax As Long
-            Dim Total As Long
-            Dim TaxPercentage As Single
+            TotalFedIncome += User.Taxinfo.FederalIncome - User.Taxinfo.ExtraIncome
+            TotalExtraIncome += User.Taxinfo.ExtraIncome
+            TotalNewpondIncome += User.Taxinfo.NewpondIncome
+            TotalUrbiaIncome += User.Taxinfo.UrbiaIncome
+            TotalParadisusIncome += User.Taxinfo.ParadisusIncome
+            TotalLaertesIncome += User.Taxinfo.LaertesIncome
+            TotalNOSTENIncome += User.Taxinfo.NorthOstenIncome
+            TotalSOSTENIncome += User.Taxinfo.SouthOstenIncome
 
+            TotalIncome += User.Taxinfo.FederalIncome
 
-            Income = Incomes(0)
-            EI = Incomes(1)
-            If Government Then
-                Income = 0
-                EI = 0
-            End If
-
-            Total = Income + EI
-
-            If corporate Then
-
-                If Total > 500000000 Then
-                    Tax = Total * 0.02
-                    TaxPercentage = 0.02
-                Else
-                    Tax = 0
-                    TaxPercentage = 0
-                End If
-
-            ElseIf Government Then
-                Tax = 0
-                TaxPercentage = 0
-            Else
-                If Total > 5000000 Then
-                    Tax = Total * 0.05
-                    TaxPercentage = 0.05
-                Else
-                    Tax = 0
-                    TaxPercentage = 0
-                End If
-
-            End If
-            'PrintLine(1, "ID,NAME,CORPORATE,UMSNB,GBANK,RIVER,TOTAL,INCOME,PERCENTAGE,TAX")
-            PrintLine(1, LogonID & "," & Username & "," & corporate.ToString & "," & UMSNBBalance & "," & GBANKBalance & "," & RIVERBalance & "," & TotalBalance & "," & Income & "," & EI & "," & Total & "," & TaxPercentage & "," & Tax)
-
-            UMSNBTotalBalance += UMSNBBalance
-            GBANKTotalBalance += GBANKBalance
-            RIVERTotalBalance += RIVERBalance
-            AllTotalBalance += TotalBalance
-            AllMonthlyIncome += Income
-            AllExtraIncome += EI
-            AllTotalIncome += Total
-            AllTotalTax += Tax
-GovernmentAccountSkip:
-
+            TotalFedTax += User.Taxinfo.Federal.MoneyOwed
+            TotalNewpondTax += User.Taxinfo.Newpond.MoneyOwed
+            TotalUrbiaTax += User.Taxinfo.Urbia.MoneyOwed
+            TotalParadisusTax += User.Taxinfo.Paradisus.MoneyOwed
+            TotalLaertesTax += User.Taxinfo.Laertes.MoneyOwed
+            TotalNOSTENTax += User.Taxinfo.NorthOsten.MoneyOwed
+            TotalSOSTENTax += User.Taxinfo.SouthOsten.MoneyOwed
         Next
-
 
         CurrentWorkerStage = 1
         CurrentWorkerStatus = "Finalizing Report"
         DoTheCoso.ReportProgress(90)
-        'PrintLine(1, "ID,NAME,CORPORATE,UMSNB,GBANK,RIVER,TOTAL,MI,EI,PERCENTAGE,TAX")
-        PrintLine(1, "Total:,,," & UMSNBTotalBalance & "," & GBANKTotalBalance & "," & RIVERTotalBalance & "," & AllTotalBalance & "," & AllMonthlyIncome & "," & AllExtraIncome & "," & AllTotalIncome & ",," & AllTotalTax)
+        PrintLine(1, ",TOTAL" & "," &
+                  "" & "," &
+                  "" & "," &
+                  UMSNBTotalBalance & "," &
+                  GBANKTotalBalance & "," &
+                  RIVERTotalBalance & "," &
+                  AllTotalBalance & "," &
+                  "" & "," &
+                  TotalNewpondIncome & "," &
+                  TotalUrbiaIncome & "," &
+                  TotalParadisusIncome & "," &
+                  TotalLaertesIncome & "," &
+                  TotalNOSTENIncome & "," &
+                  TotalSOSTENIncome & "," &
+                  TotalExtraIncome & "," &
+                  TotalIncome & "," &
+                  "" & "," & "" & "," & "" & "," & "" & "," & "" & "," & "" & "," & "" & "," & "" & "," & "" & "," &
+                  TotalNewpondTax & "," &
+                  TotalUrbiaTax & "," &
+                  TotalParadisusTax & "," &
+                  TotalLaertesTax & "," &
+                  TotalNOSTENTax & "," &
+                  TotalSOSTENTax & "," &
+                  TotalFedTax)
         FileClose(1)
     End Sub
 
